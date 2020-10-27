@@ -21,37 +21,33 @@ packageId = 1
 st = b'U'
 con = b'\xaa'
 
-def turnOn():
-	device = adapter.connect(mac)
-	device.write_char(uuid, st + bytes([packageId]) + bytes[(255)] + token + con)
-	print("SentBle", st + bytes([packageId]) + bytes[(255)] + token + con)
-	device.write_char(uuid, st + bytes([packageId]) + bytes[(3)] + con)
-	print("SentBle", st + bytes([packageId]) + bytes[(3)] + token + con)
+ans = ""
 
 def turnOn():
 	device = adapter.connect(mac)
-	device.write_char(uuid, st + bytes([packageId]) + bytes[(255)] + token + con)
-	print("SentBle", st + bytes([packageId]) + bytes[(255)] + token + con)
-	device.write_char(uuid, st + bytes([packageId]) + bytes[(4)] + con)
-	print("SentBle", st + bytes([packageId]) + bytes[(4)] + token + con)
+	device.write_char(uuid, st + bytes([packageId]) + bytes([255]) + token + con)
+	device.write_char(uuid, st + bytes([packageId]) + bytes([3]) + con)
+
+def turnOff():
+	device = adapter.connect(mac)
+    device.write_char(uuid, st + bytes([packageId]) + bytes([255]) + token + con)
+    device.write_char(uuid, st + bytes([packageId]) + bytes([4]) + con)
 
 while True:
     data = conn.recv(1024)
     print("Received", data)
     if data == b'turnOn':
-    	if state == 0:
-    		turnOn()
-    		state = 1
-    		conn.send("turnedOn")
-    	else:
-    		conn.send("No")
+    	turnOn()
+    	conn.send("turnedOn")
     elif data == b'turnOff':
-		if state == 0:
-    		turnOff()
-    		state = 0
-    		conn.send("turnedOff")
-    	else:
-    		conn.send("No")
+    	turnOff()
+    	conn.send("turnedOff")
+    elif data == b'getState':
+        turnOff()
+        while len(ans) == 0:
+            pass
+        conn.send(ans)
+        ans = ""
     elif not data:
         break
     
