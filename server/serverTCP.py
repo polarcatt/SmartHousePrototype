@@ -5,6 +5,7 @@ print ('started')
 sock = socket.socket()
 
 port = 11815
+port2 = 11814
 
 sock.bind(('localhost', port))
 sock.listen(1)
