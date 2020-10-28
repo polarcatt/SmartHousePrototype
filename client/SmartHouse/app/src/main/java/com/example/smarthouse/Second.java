@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 
@@ -134,20 +135,20 @@ public class Second extends Activity {
 
     public void onSwitchClick(View v)
     {
-    @SuppressLint("UseSwitchCompatOrMaterialCode") Switch sw = (Switch)findViewById(R.id.switch1);
+        Switch swi = (Switch) findViewById(R.id.switch1);
 
-    try
-    {
-    Socket sock = new Socket("192.168.43.167", 11815);
-    String m = "turnOff";
-    OutputStream ostream = sock.getOutputStream();
-    DataOutputStream dos = new DataOutputStream(ostream);
-    dos.writeBytes(m);
-    dos.close();
-    ostream.close();
-    sock.close();
-    }
-     (IOException e) {
-     e.printStackTrace();
+        swi.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+
+                if (isChecked) {
+                    blabla;
+                }
+                else {
+                    blabla;
+                }
+            }
+        }
     }
 }
