@@ -3,4 +3,7 @@
     <string name="button1">****</string>
     <string name="button2">cancel</string>
     <string name="button3">verify</string>
+    <string name="connect">connect</string>
+    <string name="ip_12345">IP: 12345</string>
+    <string name="switch1">Switch</string>
 </resources>
