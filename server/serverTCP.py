@@ -34,6 +34,13 @@ def turnOff():
     device.write_char(uuid, st + bytes([packageId]) + bytes([255]) + token + con)
     device.write_char(uuid, st + bytes([packageId]) + bytes([4]) + con)
 
+
+
+def turnOff():
+    device = adapter.connect(mac)
+    device.write_char(uuid, st + bytes([packageId]) + bytes([255]) + token + con)
+    device.write_char(uuid, st + bytes([packageId]) + bytes([6]) + con)
+
 while True:
     data = conn.recv(1024)
     print("Received", data)
@@ -49,8 +56,6 @@ while True:
             pass
         conn.send(ans)
         ans = ""
-    elif not data:
-        break
     
 print("Closing Server")
 conn.close()         
