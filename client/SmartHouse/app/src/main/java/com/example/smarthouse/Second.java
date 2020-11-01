@@ -23,6 +23,15 @@ public class Second extends Activity {
     private  String HOST = "10.120.51.22";
     private  int PORT = 9574;
     private Button close = null;
+    //outputStream:
+    private OutputStream output;
+    //InputStream:
+    private InputStram input;
+    //DataOutputStream
+    private DataOutputStream dos;
+    //DataInputStream
+    private DataInputStream dstream;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +75,8 @@ public class Second extends Activity {
                     Log.d(LOG_TAG, "Соединение установлено");
                     Log.d(LOG_TAG, "(mConnect != null) = "
                             + (mConnect != null));
+                    // Отправка "Hello" серверу
+                    dos.writeBytes("Hello");
                 } catch (Exception e) {
                     Log.e(LOG_TAG, e.getMessage());
                     mConnect = null;
@@ -104,6 +115,14 @@ public class Second extends Activity {
             try {
                 // Создание сокета
                 mSocket = new Socket(mHost, mPort);
+                // output
+                output = mSocket.getOutputStream();
+                // input
+                input = mSocket.getInputSteam();
+                // dos
+                dos = new DataOutputStream(output);
+                // dstream
+                dstream = new DataInputStream(input);
             } catch (IOException e) {
                 throw new Exception("Невозможно создать сокет: "
                         + e.getMessage());
@@ -117,6 +136,10 @@ public class Second extends Activity {
             if (mSocket != null && !mSocket.isClosed()) {
                 try {
                     mSocket.close();
+                    dos.close();
+                    input.close();
+                    output.close();
+                    dstream.close();
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "Ошибка при закрытии сокета :"
                             + e.getMessage());
@@ -143,12 +166,43 @@ public class Second extends Activity {
             {
 
                 if (isChecked) {
-                    blabla;
+                    dos.writeBytes("turnOn");
                 }
                 else {
-                    blabla;
+                    dos.writeBytes("turnOff");
                 }
             }
         }
+    }
+
+    public GetReceivedData()
+    {
+        // читает строку с сервера
+        String line;
+        line = dstream.readline();
+        // проверка состояния лампочки
+        if (line == "On") {
+            ApplyState(true);
+        } else if (line == "Off") {
+            ApplyState(false);
+        }
+    }
+
+    public Tick()
+    {
+        new Thread(new Runnable() {
+        @Override
+            public void run() {
+                // вызов функции состояния
+                GetReceivedData();
+            }
+        }).start();
+    }
+
+    public boolean ApplyState(boolean state)
+    {
+        swi.setOnCheckedChangeListener(null);
+        swi.setOnChecked(state);
+        swi.setOnCheckedChangeListener(this);
     }
 }
