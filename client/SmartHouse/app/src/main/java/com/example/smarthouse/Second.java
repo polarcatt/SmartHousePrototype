@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -28,7 +29,6 @@ public class Second extends Activity {
     private Second.Connection mConnect  = null;
     private  String HOST = "192.168.1.62";
     private  int PORT = 11815;
-    private Button close = null;
     private boolean started = false;
     private Handler handler = new Handler();
 
@@ -82,7 +82,8 @@ public class Second extends Activity {
                 onCloseClick();
             }
         });
-
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
     }
     public void onOpenClick()
     {
@@ -94,20 +95,18 @@ public class Second extends Activity {
             public void run() {
                 try {
                     mConnect.openConnection();
-                    // Разблокирование кнопок в UI потоке
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            close.setEnabled(true);
                         }
                     });
-                    Log.d(LOG_TAG, "Соединение установлено");
-                    Log.d(LOG_TAG, "(mConnect != null) = "
+                    Log.i(LOG_TAG, "Соединение установлено");
+                    Log.i(LOG_TAG, "(mConnect != null) = "
                             + (mConnect != null));
                     // Отправка "Hello" серверу
                     dos.writeBytes("Hello");
                 } catch (Exception e) {
-                    Log.e(LOG_TAG, e.getMessage());
+                    Log.i(LOG_TAG, e.getMessage());
                     mConnect = null;
                 }
             }
@@ -115,11 +114,8 @@ public class Second extends Activity {
     }
 
     public void onCloseClick() {
-        // Закрытие соединения
         mConnect.closeConnection();
-        // Блокирование кнопок
-        close.setEnabled(false);
-        Log.d(LOG_TAG, "Соединение закрыто");
+        Log.i(LOG_TAG, "Соединение закрыто");
     }
 
     public static class Connection {
@@ -162,7 +158,7 @@ public class Second extends Activity {
                     output.close();
                     dstream.close();
                 } catch (IOException e) {
-                    Log.e(LOG_TAG, "Ошибка при закрытии сокета :"
+                    Log.i(LOG_TAG, "Ошибка при закрытии сокета :"
                             + e.getMessage());
                 } finally {
                     mSocket = null;
@@ -191,7 +187,8 @@ public class Second extends Activity {
                         dos.writeBytes("turnOff");
                     }
                 }catch (IOException e){
-
+                    Log.i(LOG_TAG, "Ошибка при записи"
+                            + e.getMessage());
                 }
             }
         }
@@ -200,16 +197,18 @@ public class Second extends Activity {
 
     public String GetReceivedData() throws IOException {
         if(dstream != null && dstream.available() > 0) {
+            Log.i(LOG_TAG, "ЖДЕМ");
             String line;
-            line = dstream.readUTF();
+            line = dstream.readLine();
             return line;
         }else return "";
     }
 
     public void Tick() throws IOException {
         String data = GetReceivedData();
-        ApplyState(data.equals("On"));
-        Log.i("SOCK", "ТИК");
+        Log.i(LOG_TAG, data);
+        //ApplyState(data == 825307441);
+        Log.i(LOG_TAG, "ТИК");
     }
 
     public void ApplyState(boolean state)
@@ -217,6 +216,7 @@ public class Second extends Activity {
         Switch swi = (Switch) findViewById(R.id.switch1);
         swi.setOnCheckedChangeListener(null);
         swi.setChecked(state);
+
         swi.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
         {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
