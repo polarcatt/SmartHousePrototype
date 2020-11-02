@@ -198,9 +198,37 @@ public class Second extends Activity {
     public String GetReceivedData() throws IOException {
         if(dstream != null && dstream.available() > 0) {
             Log.i(LOG_TAG, "ЖДЕМ");
-            String line;
+
+            int len = dstream.readInt();
+            StringBuilder str = new StringBuilder(len);
+            byte[] data = new byte[len];
+            boolean end = false;
+            int totalBytesRead = 0;
+
+            while(!end) 
+            {
+                int curBytesRead = dstream.read(data);
+                totalBytesRead = totalBytesRead + curBytesRead;
+
+                if (totalBytesRead <= len) {
+                    str.append(new String(data, 0, curBytesRead, StandardCharset.UTF_8));
+                } else {
+                    str.append(new String(data, 0, len - totalBytesRead + curBytesRead, StandardCharset.UTF_8));
+                }
+                if(str.length() >= len) {
+                    end = true;
+                }
+            }
+
+            for (int i = 0; i < len; i++)
+            {
+                str.append(data[i]);
+            }
+
+            return str.toString();
+            /*String line;
             line = dstream.readLine();
-            return line;
+            return line;*/
         }else return "";
     }
 
