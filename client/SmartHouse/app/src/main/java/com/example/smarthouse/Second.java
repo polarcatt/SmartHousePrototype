@@ -3,6 +3,7 @@ package com.example.smarthouse;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,17 +26,19 @@ public class Second extends Activity {
     private EditText code;
     private Button verify;
     private Second.Connection mConnect  = null;
-    private  String HOST = "10.120.51.22";
-    private  int PORT = 9574;
+    private  String HOST = "192.168.1.62";
+    private  int PORT = 11815;
     private Button close = null;
+    private boolean started = false;
+    private Handler handler = new Handler();
+
 
     private static OutputStream output;
     private static InputStream input;
     private static DataOutputStream dos;
     private static DataInputStream dstream;
 
-    private Timer timer;
-    private TimerTask timerTask = new TimerTask() {
+    private Runnable timer = new Runnable () {
 
         @Override
         public void run() {
@@ -44,20 +47,18 @@ public class Second extends Activity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            handler.postDelayed(timer, 1000);
         }
     };
 
-    public void startLoop() {
-        if(timer != null) {
-            return;
-        }
-        timer = new Timer();
-        timer.scheduleAtFixedRate(timerTask, 0, 500);
+    public void stop() {
+        started = false;
+        handler.removeCallbacks(timer);
     }
 
-    public void stopLoop() {
-        timer.cancel();
-        timer = null;
+    public void startLoop() {
+        started = true;
+        handler.postDelayed(timer, 1000);
     }
 
 
@@ -136,10 +137,7 @@ public class Second extends Activity {
             this.mPort = port;
         }
 
-        // Метод открытия сокета
         public void openConnection() throws Exception {
-            // Если сокет уже открыт, то он закрывается
-            closeConnection();
             try {
                 mSocket = new Socket(mHost, mPort);
                 output = mSocket.getOutputStream();
@@ -201,11 +199,9 @@ public class Second extends Activity {
     }
 
     public String GetReceivedData() throws IOException {
-        // читает строку с сервера
         if(dstream != null && dstream.available() > 0) {
             String line;
             line = dstream.readUTF();
-            // проверка состояния лампочки
             return line;
         }else return "";
     }
@@ -213,6 +209,7 @@ public class Second extends Activity {
     public void Tick() throws IOException {
         String data = GetReceivedData();
         ApplyState(data.equals("On"));
+        Log.i("SOCK", "ТИК");
     }
 
     public void ApplyState(boolean state)
