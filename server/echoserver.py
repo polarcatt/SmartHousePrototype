@@ -18,14 +18,29 @@ addrs = {}
 i = 0
 state = 0
 
+def turnOn():
+    device = adapter.connect(mac)
+    device.write_char(uuid, st + bytes([packageId]) + bytes([255]) + token + con)
+    device.write_char(uuid, st + bytes([packageId]) + bytes([3]) + con)
+
+def turnOff():
+    device = adapter.connect(mac)
+    device.write_char(uuid, st + bytes([packageId]) + bytes([255]) + token + con)
+    device.write_char(uuid, st + bytes([packageId]) + bytes([4]) + con)
+
+def getState():
+    device = adapter.connect(mac)
+    device.write_char(uuid, st + bytes([packageId]) + bytes([255]) + token + con)
+    device.write_char(uuid, st + bytes([packageId]) + bytes([6]) + con)
+    device.subscribe(read_uuid, callback = handle_data)
+
+def handle_data(handle, value):
+    print("Received data: %s" % hexlify(value))
+    state = value.count(b'\x01')
+
 
 try:
     while True:
-        i += 1
-        if i > 1:
-            i = 0
-            state = 1 - state
-            print("Changed state!", state)
         toread, towrite, exc = select.select(rlist, wlist, rlist)
         #print(rlist)
         for r in toread:
@@ -41,6 +56,10 @@ try:
                 print("!", data)
                 if len(data) != 0:
                     print("Received: " + str(data), "from", addrs[r])
+                if data == "turnOn":
+                    turnOn()
+                if data == "turnOff":
+                    turnOff()
                 else:   
                     rlist.remove(r)
                     if r in wlist:
