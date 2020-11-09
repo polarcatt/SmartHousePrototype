@@ -27,9 +27,10 @@ public class Second extends Activity {
     private EditText code;
     private Button verify;
     private Second.Connection mConnect  = null;
-    private  String HOST = "192.168.1.62";
-    private  int PORT = 11815;
+    private  String HOST = "192.168.43.53";
+    private  int PORT = 11813;
     private boolean started = false;
+    private boolean curstate = false;
     private Handler handler = new Handler();
 
 
@@ -47,7 +48,7 @@ public class Second extends Activity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            handler.postDelayed(timer, 1000);
+            handler.postDelayed(timer, 100);
         }
     };
 
@@ -58,7 +59,7 @@ public class Second extends Activity {
 
     public void startLoop() {
         started = true;
-        handler.postDelayed(timer, 1000);
+        handler.postDelayed(timer, 100);
     }
 
 
@@ -176,67 +177,51 @@ public class Second extends Activity {
     public void onSwitchClick(View v)
     {
         Switch swi = (Switch) findViewById(R.id.switch1);
-        swi.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-            {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                try {
-                    if (isChecked) {
-                        dos.writeBytes("turnOn");
-                    } else {
-                        dos.writeBytes("turnOff");
-                    }
-                }catch (IOException e){
-                    Log.i(LOG_TAG, "Ошибка при записи"
-                            + e.getMessage());
+        boolean isChecked = swi.isChecked();
+        Log.i(LOG_TAG, "Свитч");
+
+        if(dos != null) {
+            try {
+                if (isChecked) {
+                    dos.writeBytes("turnOn");
+                } else {
+                    dos.writeBytes("turnOff");
                 }
+            } catch (IOException e) {
+                Log.i(LOG_TAG, "Ошибка при записи"
+                        + e.getMessage());
             }
         }
-        );
     }
 
     public String GetReceivedData() throws IOException {
         if(dstream != null && dstream.available() > 0) {
             Log.i(LOG_TAG, "ЖДЕМ");
 
-            int len = dstream.readInt();
-            StringBuilder str = new StringBuilder(len);
-            byte[] data = new byte[len];
-            boolean end = false;
-            int totalBytesRead = 0;
+            byte[] messageByte = new byte[1000];
+            String dataString = "";
+            int bytesRead;
 
-            while(!end) 
+            while((bytesRead = dstream.read(messageByte)) > 0)
             {
-                int curBytesRead = dstream.read(data);
-                totalBytesRead = totalBytesRead + curBytesRead;
-
-                if (totalBytesRead <= len) {
-                    str.append(new String(data, 0, curBytesRead, StandardCharset.UTF_8));
-                } else {
-                    str.append(new String(data, 0, len - totalBytesRead + curBytesRead, StandardCharset.UTF_8));
-                }
-                if(str.length() >= len) {
-                    end = true;
-                }
+                String temp = new String(messageByte, 0, bytesRead);
+                dataString += temp;
+                if(temp.endsWith("!"))break;
             }
-
-            for (int i = 0; i < len; i++)
-            {
-                str.append(data[i]);
-            }
-
-            return str.toString();
-            /*String line;
-            line = dstream.readLine();
-            return line;*/
+            Log.i(LOG_TAG, dataString);
+            return dataString;
         }else return "";
     }
 
     public void Tick() throws IOException {
         String data = GetReceivedData();
-        Log.i(LOG_TAG, data);
-        //ApplyState(data == 825307441);
+        if(data.equals("1!"))
+            curstate = true;
+        else if(data.equals("0!"))
+            curstate = false;
+        ApplyState(curstate);
         Log.i(LOG_TAG, "ТИК");
+        Log.i(LOG_TAG, data);
     }
 
     public void ApplyState(boolean state)
@@ -244,21 +229,5 @@ public class Second extends Activity {
         Switch swi = (Switch) findViewById(R.id.switch1);
         swi.setOnCheckedChangeListener(null);
         swi.setChecked(state);
-
-        swi.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-        {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-            {
-                try {
-                    if (isChecked) {
-                        dos.writeBytes("turnOn");
-                    } else {
-                        dos.writeBytes("turnOff");
-                    }
-                }catch (IOException e){
-
-                }
-            }
-        });
     }
 }

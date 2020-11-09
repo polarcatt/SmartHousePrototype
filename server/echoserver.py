@@ -3,8 +3,8 @@ import socket
 import sys
 import time
 
-port = 11815
-host = "192.168.1.62"
+port = 11813
+host = "192.168.43.53"
 
 time.sleep(1)
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -22,7 +22,7 @@ state = 0
 try:
     while True:
         i += 1
-        if i > 100:
+        if i > 1:
             i = 0
             state = 1 - state
             print("Changed state!", state)
@@ -47,13 +47,11 @@ try:
                         wlist.remove(r)
                     print("Connection with", "smb", "ended")
                     r.close()
-
         for w in towrite:
             if state:
-                w.sendall(b"1")
+                w.sendall(b"1!")
             else:
-                w.sendall(b"0")
-
+                w.sendall(b"0!")
         for e in exc:
             print("!!!")
             if e in rlist:
@@ -61,7 +59,7 @@ try:
             if e in wlist:
                 wlist.remove(e)
             e.close()
-        time.sleep(0.001)
+        time.sleep(1)
 
 
 except KeyboardInterrupt:

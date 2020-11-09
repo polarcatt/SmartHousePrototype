@@ -34,12 +34,14 @@ def turnOff():
     device.write_char(uuid, st + bytes([packageId]) + bytes([255]) + token + con)
     device.write_char(uuid, st + bytes([packageId]) + bytes([4]) + con)
 
+def read_func():
+    pass
 
-
-def turnOff():
+def getState():
     device = adapter.connect(mac)
     device.write_char(uuid, st + bytes([packageId]) + bytes([255]) + token + con)
     device.write_char(uuid, st + bytes([packageId]) + bytes([6]) + con)
+    device.subscribe(read_uuid, callback = read_func)
 
 while True:
     data = conn.recv(1024)
