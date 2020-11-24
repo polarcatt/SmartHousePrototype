@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/button6"
+        android:layout_width="119dp"
+        android:layout_height="41dp"
+        android:text="Rename"
+        tools:layout_editor_absoluteX="18dp"
+        tools:layout_editor_absoluteY="674dp" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="128dp"
+        android:layout_height="40dp"
+        android:text="Delete device"
+        tools:layout_editor_absoluteX="147dp"
+        tools:layout_editor_absoluteY="675dp" />
+
+    <Switch
+        android:id="@+id/switch2"
+        android:layout_width="104dp"
+        android:layout_height="40dp"
+        android:text="On/off"
+        tools:layout_editor_absoluteX="285dp"
+        tools:layout_editor_absoluteY="674dp" />
+
+    <TextView
+        android:id="@+id/deviceName"
+        android:layout_width="449dp"
+        android:layout_height="65dp"
+        android:background="#706262"
+        android:gravity="center"
+        android:text="DeviceName"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        tools:layout_editor_absoluteX="-4dp"
+        tools:layout_editor_absoluteY="13dp" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="427dp"
+        android:layout_height="568dp"
+        android:text="Розетка №2"
+        android:textSize="24sp"
+        tools:layout_editor_absoluteX="6dp"
+        tools:layout_editor_absoluteY="147dp" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="431dp"
+        android:layout_height="44dp"
+        android:text="Розетка №1"
+        android:textSize="24sp"
+        tools:layout_editor_absoluteX="6dp"
+        tools:layout_editor_absoluteY="95dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
