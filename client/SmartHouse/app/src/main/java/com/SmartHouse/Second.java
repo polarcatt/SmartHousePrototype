@@ -11,7 +11,5 @@ public class Second extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.second_activity);
-        Button close = (Button) findViewById(R.id.button5);
-        close.setEnabled(false);
     }
 }

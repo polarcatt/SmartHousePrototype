@@ -12,6 +12,8 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 
+import com.SmartHouse.R;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -39,28 +41,7 @@ public class Second extends Activity {
     private static DataOutputStream dos;
     private static DataInputStream dstream;
 
-    private Runnable timer = new Runnable () {
 
-        @Override
-        public void run() {
-            try {
-                Tick();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            handler.postDelayed(timer, 100);
-        }
-    };
-
-    public void stop() {
-        started = false;
-        handler.removeCallbacks(timer);
-    }
-
-    public void startLoop() {
-        started = true;
-        handler.postDelayed(timer, 100);
-    }
 
 
     @Override
@@ -68,19 +49,10 @@ public class Second extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.second_activity);
         Button connect = (Button) findViewById(R.id.button4);
-        Button close = (Button) findViewById(R.id.button5);
-        close.setEnabled(false);
-        startLoop();
         connect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onOpenClick();
-            }
-        });
-        close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onCloseClick();
             }
         });
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -174,26 +146,6 @@ public class Second extends Activity {
         }
     }
 
-    public void onSwitchClick(View v)
-    {
-        Switch swi = (Switch) findViewById(R.id.switch1);
-        boolean isChecked = swi.isChecked();
-        Log.i(LOG_TAG, "Свитч");
-
-        if(dos != null) {
-            try {
-                if (isChecked) {
-                    dos.writeBytes("turnOn");
-                } else {
-                    dos.writeBytes("turnOff");
-                }
-            } catch (IOException e) {
-                Log.i(LOG_TAG, "Ошибка при записи"
-                        + e.getMessage());
-            }
-        }
-    }
-
     public String GetReceivedData() throws IOException {
         if(dstream != null && dstream.available() > 0) {
             Log.i(LOG_TAG, "ЖДЕМ");
@@ -211,23 +163,5 @@ public class Second extends Activity {
             Log.i(LOG_TAG, dataString);
             return dataString;
         }else return "";
-    }
-
-    public void Tick() throws IOException {
-        String data = GetReceivedData();
-        if(data.equals("1!"))
-            curstate = true;
-        else if(data.equals("0!"))
-            curstate = false;
-        ApplyState(curstate);
-        Log.i(LOG_TAG, "ТИК");
-        Log.i(LOG_TAG, data);
-    }
-
-    public void ApplyState(boolean state)
-    {
-        Switch swi = (Switch) findViewById(R.id.switch1);
-        swi.setOnCheckedChangeListener(null);
-        swi.setChecked(state);
     }
 }
